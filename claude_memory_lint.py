@@ -67,10 +67,10 @@ import re
 import sys
 from typing import Dict, List, Optional, Set
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 WIKILINK = re.compile(r"\[\[([^\[\]]+)\]\]")
-MDLINK = re.compile(r"\]\(([^)\s]+\.md)\)")
+MDLINK = re.compile(r"\]\(([^)\s]+\.md)(?:#[^)\s]*)?\)")
 INLINE_CODE = re.compile(r"`[^`\n]*`")
 FENCED_CODE = re.compile(r"```.*?```", re.S)
 NAME_FIELD = re.compile(r"^name:[ \t]*(.*)$", re.M)
@@ -159,8 +159,12 @@ class Note:
         return parts[1] if len(parts) >= 3 else ""
 
     def prose(self) -> str:
-        """Body with code stripped - links inside code are examples, not links."""
-        return INLINE_CODE.sub(" ", FENCED_CODE.sub(" ", self.text))
+        """Body with code stripped - links inside code are examples, not links.
+
+        Fenced blocks keep their newlines so reported line numbers stay
+        accurate for everything after them."""
+        text = FENCED_CODE.sub(lambda m: "\n" * m.group(0).count("\n"), self.text)
+        return INLINE_CODE.sub(" ", text)
 
 
 class Issue:
@@ -219,8 +223,11 @@ def is_index(filename: str, patterns: List[str]) -> bool:
 
 
 def normalize(s: str) -> str:
-    """Fold case and separators: 'My-Note' and 'my_note' compare equal."""
-    return re.sub(r"[^a-z0-9]", "", s.lower())
+    """Fold case and separators: 'My-Note' and 'my_note' compare equal.
+
+    Letters and digits of any script survive, so non-Latin names compare by
+    their letters instead of all collapsing into the same empty string."""
+    return re.sub(r"[\W_]", "", s.lower())
 
 
 def build_rename_map(notes: Dict[str, Note]) -> Dict[str, str]:
@@ -239,7 +246,8 @@ def build_rename_map(notes: Dict[str, Note]) -> Dict[str, str]:
     out: Dict[str, str] = {}
     for table in (exact, stems):
         for key, hits in table.items():
-            if len(hits) == 1:
+            # an empty key would make every unmatchable link "resolve" here
+            if key and len(hits) == 1:
                 out.setdefault(key, hits[0])
     return out
 
@@ -364,13 +372,21 @@ def fix(memory: pathlib.Path) -> Dict[str, int]:
                 return f"[[{hit}]]"
             return m.group(0)
 
-        # only rewrite links outside code spans
+        # only rewrite links outside code - fenced blocks and inline spans
+        # are examples, exactly as check() treats them
+        protected = sorted(
+            [m.span() for m in FENCED_CODE.finditer(text)]
+            + [m.span() for m in INLINE_CODE.finditer(text)]
+        )
         pieces = []
         last = 0
-        for span in INLINE_CODE.finditer(text):
-            pieces.append(WIKILINK.sub(repair, text[last:span.start()]))
-            pieces.append(span.group(0))
-            last = span.end()
+        for start, end in protected:
+            if end <= last:
+                continue
+            start = max(start, last)
+            pieces.append(WIKILINK.sub(repair, text[last:start]))
+            pieces.append(text[start:end])
+            last = end
         pieces.append(WIKILINK.sub(repair, text[last:]))
         text = "".join(pieces)
 

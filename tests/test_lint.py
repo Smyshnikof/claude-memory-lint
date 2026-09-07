@@ -113,6 +113,35 @@ class TestDetection(MemoryFixture):
         self.write("my_note.md", note("my_note"))
         self.assertTrue(any("did you mean [[my_note]]" in m for m in self.messages()))
 
+    def test_line_number_stays_accurate_after_a_fenced_block(self):
+        self.index("alpha")
+        body = "```\ncode line\n```\n\nbroken [[ghost]] here"
+        self.write("alpha.md", note("alpha", body))
+        broken = [i for i in lint.check(self.dir)["issues"] if i.kind == "broken-link"]
+        self.assertEqual(len(broken), 1)
+        self.assertEqual(broken[0].line, 10)  # 5 frontmatter/blank lines + 5 body lines
+
+    def test_cyrillic_link_is_not_matched_to_an_unrelated_cyrillic_note(self):
+        # all-Cyrillic names used to normalize to the same empty string,
+        # making any Cyrillic dangling link an "unambiguous" match
+        self.index("alpha", "тестовая_заметка")
+        self.write("alpha.md", note("alpha", "points at [[другое-имя]]"))
+        self.write("тестовая_заметка.md", note("тестовая_заметка"))
+        self.assertFalse(any("did you mean" in m for m in self.messages()))
+
+    def test_cyrillic_separator_drift_gets_a_suggestion(self):
+        self.index("alpha", "тестовая_заметка")
+        self.write("alpha.md", note("alpha", "points at [[тестовая-заметка]]"))
+        self.write("тестовая_заметка.md", note("тестовая_заметка"))
+        self.assertTrue(
+            any("did you mean [[тестовая_заметка]]" in m for m in self.messages())
+        )
+
+    def test_md_link_with_anchor_is_still_checked(self):
+        self.index("alpha")
+        self.write("alpha.md", note("alpha", "see [part](missing-file.md#section)"))
+        self.assertIn("broken-path", self.kinds())
+
 
 class TestFix(MemoryFixture):
     def test_fix_repairs_separator_drift(self):
@@ -145,6 +174,27 @@ class TestFix(MemoryFixture):
         self.write("my_note.md", note("my_note"))
         lint.fix(self.dir)
         self.assertIn("`[[my-note]]`", (self.dir / "alpha.md").read_text(encoding="utf-8"))
+
+    def test_fix_never_touches_links_inside_fenced_blocks(self):
+        self.index("alpha", "my_note")
+        body = "```markdown\nexample: [[my-note]]\n```\n\nreal link [[my-note]]"
+        self.write("alpha.md", note("alpha", body))
+        self.write("my_note.md", note("my_note"))
+        stats = lint.fix(self.dir)
+        text = (self.dir / "alpha.md").read_text(encoding="utf-8")
+        self.assertIn("example: [[my-note]]", text)  # fenced example untouched
+        self.assertIn("real link [[my_note]]", text)  # prose link repaired
+        self.assertEqual(stats["links"], 1)
+
+    def test_fix_does_not_rewrite_a_cyrillic_link_to_an_unrelated_note(self):
+        self.index("alpha", "тестовая_заметка")
+        self.write("alpha.md", note("alpha", "points at [[другое-имя]]"))
+        self.write("тестовая_заметка.md", note("тестовая_заметка"))
+        stats = lint.fix(self.dir)
+        self.assertEqual(stats["links"], 0)
+        self.assertIn(
+            "[[другое-имя]]", (self.dir / "alpha.md").read_text(encoding="utf-8")
+        )
 
     def test_fix_leaves_ambiguous_links_alone(self):
         self.index("alpha", "my_note", "my-note")

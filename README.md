@@ -138,7 +138,7 @@ python claude_memory_lint.py "$MEMORY_DIR" || exit 1
 python -m unittest discover -s tests
 ```
 
-21 tests, each building a throwaway memory folder with one specific defect, so a
+27 tests, each building a throwaway memory folder with one specific defect, so a
 failure names the check that broke.
 
 ## License
