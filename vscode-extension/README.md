@@ -15,8 +15,11 @@ Claude Code's file-based memory, one click away in the editor.
 - **`[✓]` icon in the Activity Bar** → “Claude Memory” panel. ↻ checks every
   memory folder (`--all`), 🔧 runs `--fix` after a modal confirmation.
 - **Badge on the icon** — the number of issues (like the git counter).
-- **Findings list**: red — broken `[[links]]`/paths/duplicates, yellow —
-  orphans and frontmatter. Click opens the note at the offending line.
+- **Findings grouped by project** — one row per memory folder with note/issue
+  counts; click a project to open its `MEMORY.md`. Red — broken
+  `[[links]]`/paths/duplicates, yellow — orphans and frontmatter. Click a
+  finding to open the note at the offending line. The panel header shows when
+  the last check ran.
 - **Editor squiggles** + the Problems panel — the same findings.
 - **Ctrl+click on a `[[wikilink]]`** in a memory note opens its target.
 - **Auto-check**: on VS Code startup and whenever a memory note is saved.

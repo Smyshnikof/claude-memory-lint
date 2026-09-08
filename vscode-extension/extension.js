@@ -58,56 +58,81 @@ function runLinter(args) {
 // --------------------------------------------------------------------------
 // panel
 
+function issueItem(memory, issue) {
+  const file = path.join(memory, issue.note + ".md");
+  const line = Math.max(0, (issue.line || 1) - 1);
+  const item = new vscode.TreeItem(
+    `${issue.note}.md` + (issue.line ? `:${issue.line}` : "")
+  );
+  item.description = issue.message;
+  item.tooltip = `${issue.kind}: ${issue.message}`;
+  item.iconPath = new vscode.ThemeIcon(
+    ERRORS.has(issue.kind) ? "error" : "warning"
+  );
+  item.command = {
+    command: "vscode.open",
+    title: "Open note",
+    arguments: [
+      vscode.Uri.file(file),
+      { selection: new vscode.Range(line, 0, line, 0) },
+    ],
+  };
+  return item;
+}
+
+// One root row per memory folder (project); findings hang under their project.
+function projectItem(result) {
+  const norm = result.memory.replace(/\\/g, "/");
+  const m = norm.match(/projects\/([^/]+)\/memory\/?$/i);
+  const issues = result.issues;
+  const item = new vscode.TreeItem(
+    m ? m[1] : result.memory,
+    issues.length
+      ? vscode.TreeItemCollapsibleState.Expanded
+      : vscode.TreeItemCollapsibleState.Collapsed
+  );
+  item.description = `${result.notes} notes · ${issues.length ? issues.length + " issues" : "clean"}`;
+  item.tooltip = result.memory;
+  item.iconPath = issues.length
+    ? new vscode.ThemeIcon("warning", new vscode.ThemeColor("list.warningForeground"))
+    : new vscode.ThemeIcon("check", new vscode.ThemeColor("testing.iconPassed"));
+  const entry = path.join(result.memory, "MEMORY.md");
+  if (fs.existsSync(entry)) {
+    item.command = {
+      command: "vscode.open",
+      title: "Open MEMORY.md",
+      arguments: [vscode.Uri.file(entry)],
+    };
+  }
+  item.children = issues.length
+    ? issues.map((issue) => issueItem(result.memory, issue))
+    : [(() => {
+        const ok = new vscode.TreeItem("no issues");
+        ok.iconPath = new vscode.ThemeIcon("check");
+        return ok;
+      })()];
+  return item;
+}
+
 class IssueTree {
   constructor() {
     this.emitter = new vscode.EventEmitter();
     this.onDidChangeTreeData = this.emitter.event;
-    this.items = null; // null = never ran (viewsWelcome is shown)
+    this.roots = null; // null = never ran (viewsWelcome is shown)
   }
 
   getTreeItem(item) {
     return item;
   }
 
-  getChildren() {
-    return this.items;
+  getChildren(element) {
+    return element ? element.children || [] : this.roots;
   }
 
   showResults(results) {
-    this.items = [];
-    let notes = 0;
-    for (const result of results) {
-      notes += result.notes;
-      for (const issue of result.issues) {
-        const file = path.join(result.memory, issue.note + ".md");
-        const line = Math.max(0, (issue.line || 1) - 1);
-        const item = new vscode.TreeItem(
-          `${issue.note}.md` + (issue.line ? `:${issue.line}` : "")
-        );
-        item.description = issue.message;
-        item.tooltip = `${issue.kind}: ${issue.message}`;
-        item.iconPath = new vscode.ThemeIcon(
-          ERRORS.has(issue.kind) ? "error" : "warning"
-        );
-        item.command = {
-          command: "vscode.open",
-          title: "Open note",
-          arguments: [
-            vscode.Uri.file(file),
-            { selection: new vscode.Range(line, 0, line, 0) },
-          ],
-        };
-        this.items.push(item);
-      }
-    }
-    const total = this.items.length;
-    if (total === 0) {
-      const ok = new vscode.TreeItem(`Clean: ${notes} notes, no issues`);
-      ok.iconPath = new vscode.ThemeIcon("check");
-      this.items = [ok];
-    }
+    this.roots = results.map(projectItem);
     this.emitter.fire();
-    return total;
+    return results.reduce((n, r) => n + r.issues.length, 0);
   }
 
   showError(message) {
@@ -115,7 +140,7 @@ class IssueTree {
     item.description = message;
     item.tooltip = message;
     item.iconPath = new vscode.ThemeIcon("flame");
-    this.items = [item];
+    this.roots = [item];
     this.emitter.fire();
   }
 }
@@ -193,8 +218,10 @@ async function lint() {
     treeView.badge = total
       ? { value: total, tooltip: `Claude memory: ${total} issues` }
       : undefined;
+    treeView.description = `checked ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
   } catch (err) {
     tree.showError(err.message);
+    treeView.description = undefined;
   }
 }
 
