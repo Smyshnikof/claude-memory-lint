@@ -1,4 +1,4 @@
-# Claude Memory Lint — VS Code extension
+# Memory Lint for Claude Code — VS Code extension
 
 <img src="icon.png" width="96" align="right" alt="extension icon">
 
@@ -6,7 +6,7 @@ Sidebar companion for the linter in this repo: the same integrity checks for
 Claude Code's file-based memory, one click away in the editor.
 
 **Install:** [VS Code Marketplace →](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
-(or search for “Claude Memory Lint” in the Extensions view).
+(or search for “Memory Lint for Claude Code” in the Extensions view).
 
 ![demo](https://raw.githubusercontent.com/Smyshnikof/claude-memory-lint/main/vscode-extension/demo.gif)
 

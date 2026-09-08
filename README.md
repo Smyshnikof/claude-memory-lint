@@ -79,7 +79,7 @@ git hook as is.
 <img src="vscode-extension/icon.png" width="96" align="right" alt="extension icon">
 
 The same checks as a sidebar panel:
-[**Claude Memory Lint** on the Marketplace](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
+[**Memory Lint for Claude Code** on the Marketplace](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
 — an Activity Bar icon with an issue-count badge, a findings list that jumps to
 the offending line, editor squiggles, Ctrl+click navigation on `[[wikilinks]]`,
 and an auto-check on startup and on save. Reads only

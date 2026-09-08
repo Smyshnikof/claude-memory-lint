@@ -85,7 +85,7 @@ python claude_memory_lint.py "PATH" --fix  # исправить часть ош�
 <img src="vscode-extension/icon.png" width="96" align="right" alt="иконка расширения">
 
 Те же проверки — панелью в редакторе:
-[**Claude Memory Lint** в Marketplace](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
+[**Memory Lint for Claude Code** в Marketplace](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
 — значок в Activity Bar с бейджем-счётчиком, список находок с переходом к
 строке, подчёркивания в редакторе, Ctrl+клик по `[[ссылкам]]`, автопроверка
 при старте и при сохранении. Читает только `~/.claude/projects/*/memory/`,

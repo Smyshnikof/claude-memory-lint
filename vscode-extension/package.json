@@ -1,8 +1,8 @@
 {
   "name": "claude-memory-lint-vscode",
-  "displayName": "Claude Memory Lint",
+  "displayName": "Memory Lint for Claude Code",
   "description": "%ext.description%",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "publisher": "smyshnikof",
   "license": "MIT",
   "icon": "icon.png",
