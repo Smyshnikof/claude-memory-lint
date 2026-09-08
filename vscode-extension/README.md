@@ -8,6 +8,8 @@ Claude Code's file-based memory, one click away in the editor.
 **Install:** [VS Code Marketplace →](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
 (or search for “Claude Memory Lint” in the Extensions view).
 
+![demo](https://raw.githubusercontent.com/Smyshnikof/claude-memory-lint/main/vscode-extension/demo.gif)
+
 ## Features
 
 - **`[✓]` icon in the Activity Bar** → “Claude Memory” panel. ↻ checks every

@@ -1,0 +1,123 @@
+<!doctype html>
+<html style="overflow:hidden">
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    width: 960px; height: 540px; overflow: hidden;
+    font-family: "Segoe UI", system-ui, sans-serif; font-size: 13px;
+    background: #1e1e1e; color: #cccccc; display: flex;
+  }
+  /* activity bar */
+  #activity { width: 48px; background: #333333; display: flex; flex-direction: column; align-items: center; padding-top: 4px; }
+  .aicon { width: 48px; height: 46px; display: flex; align-items: center; justify-content: center; color: #858585; position: relative; }
+  .aicon svg { width: 24px; height: 24px; }
+  .aicon.active { color: #ffffff; border-left: 2px solid #ffffff; }
+  #badge {
+    position: absolute; right: 6px; bottom: 4px; min-width: 16px; height: 16px;
+    border-radius: 8px; background: #BF4F33; color: #fff; font-size: 10px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; padding: 0 4px;
+  }
+  /* sidebar */
+  #sidebar { width: 300px; background: #252526; border-right: 1px solid #1b1b1b; }
+  #sidehead { display: flex; align-items: center; padding: 8px 12px; color: #bbbbbb; font-size: 11px; letter-spacing: .5px; }
+  #sidehead .title { flex: 1; }
+  #sidehead .btn { color: #cccccc; margin-left: 10px; font-size: 14px; }
+  .row { display: flex; align-items: flex-start; padding: 4px 10px; gap: 6px; line-height: 1.35; }
+  .row.selected { background: #04395e; }
+  .row .ic { flex: none; width: 16px; text-align: center; }
+  .ok-ic { color: #89d185; } .err-ic { color: #f14c4c; }
+  .row .lbl { color: #cccccc; white-space: nowrap; }
+  .row .desc { color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; }
+  /* editor */
+  #main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  #tabs { height: 35px; background: #2d2d2d; display: flex; align-items: stretch; }
+  .tab { background: #1e1e1e; color: #ffffff; padding: 0 12px; display: flex; align-items: center; gap: 8px; border-right: 1px solid #252526; border-top: 1px solid #BF4F33; }
+  .tab .close { color: #858585; }
+  .tab .dot { color: #ffffff; }
+  #editor { flex: 1; font-family: Consolas, "Courier New", monospace; font-size: 14px; line-height: 21px; padding-top: 8px; position: relative; }
+  .line { display: flex; }
+  .ln { width: 52px; text-align: right; padding-right: 18px; color: #858585; flex: none; user-select: none; }
+  .code { white-space: pre; }
+  .line.hl { background: #2a2d2e; }
+  .fm { color: #808080; } .key { color: #9cdcfe; } .str { color: #cccccc; }
+  .h1 { color: #569cd6; font-weight: 600; }
+  .squig { text-decoration: underline wavy #f14c4c 1px; text-underline-offset: 4px; }
+  #status { height: 22px; background: #007acc; color: #ffffff; font-size: 11px; display: flex; align-items: center; padding: 0 10px; gap: 14px; }
+  #status .right { margin-left: auto; display: flex; gap: 14px; }
+  /* modal */
+  #shade { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: flex-start; justify-content: center; }
+  #modal { margin-top: 120px; width: 440px; background: #252526; border: 1px solid #454545; box-shadow: 0 8px 24px rgba(0,0,0,.5); padding: 18px 20px; }
+  #modal .mtitle { font-weight: 600; margin-bottom: 8px; color: #e8e8e8; }
+  #modal .mbody { color: #b8b8b8; line-height: 1.45; margin-bottom: 16px; }
+  #modal .mbtns { display: flex; justify-content: flex-end; gap: 8px; }
+  .mbtn { padding: 5px 16px; font-size: 13px; }
+  .mbtn.primary { background: #0e639c; color: #fff; }
+  .mbtn.ghost { background: #3a3d41; color: #f0f0f0; }
+  /* toast */
+  #toast { position: fixed; right: 16px; bottom: 38px; width: 340px; background: #252526; border: 1px solid #454545; box-shadow: 0 4px 16px rgba(0,0,0,.5); padding: 12px 14px; display: flex; gap: 10px; }
+  #toast .info { color: #3794ff; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div id="activity">
+    <div class="aicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 3 H7 a1 1 0 0 0 -1 1 v16 a1 1 0 0 0 1 1 h10 a1 1 0 0 0 1 -1 V8 z"/><path d="M13 3 v5 h5"/></svg></div>
+    <div class="aicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="6"/><path d="M15.5 15.5 L20 20"/></svg></div>
+    <div class="aicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="6" r="2.2"/><circle cx="7" cy="18" r="2.2"/><circle cx="17" cy="12" r="2.2"/><path d="M7 8.2 V15.8 M9 17 C14 16 15 14.5 15 12"/></svg></div>
+    <div class="aicon active" id="ourIcon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 H4 V20 H8"/><path d="M16 4 H20 V20 H16"/><path d="M8.5 12.5 L11 15 L15.5 9.5"/></svg>
+      <div id="badge">1</div>
+    </div>
+  </div>
+
+  <div id="sidebar">
+    <div id="sidehead"><span class="title">CLAUDE MEMORY: LINT</span><span class="btn">&#x21bb;</span><span class="btn">&#x1f527;</span></div>
+    <div id="rowClean" class="row"><span class="ic ok-ic">&#x2713;</span><span class="desc" id="cleanText">Clean: 514 notes, no issues</span></div>
+    <div id="rowIssue" class="row"><span class="ic err-ic">&#x2715;</span><div><span class="lbl">ref_pipeline.md:7</span><br><span class="desc">[[project_hotcat]] does not exist &rarr; did you mean [[project_hotcut]]?</span></div></div>
+  </div>
+
+  <div id="main">
+    <div id="tabs"><div class="tab"><span>ref_pipeline.md</span><span class="close" id="tabmark">&#x2715;</span></div></div>
+    <div id="editor">
+      <div class="line"><span class="ln">1</span><span class="code fm">---</span></div>
+      <div class="line"><span class="ln">2</span><span class="code"><span class="key">name</span><span class="fm">:</span> <span class="str">ref_pipeline</span></span></div>
+      <div class="line"><span class="ln">3</span><span class="code"><span class="key">description</span><span class="fm">:</span> <span class="str">Release pipeline for the channel</span></span></div>
+      <div class="line"><span class="ln">4</span><span class="code fm">---</span></div>
+      <div class="line"><span class="ln">5</span><span class="code"> </span></div>
+      <div class="line"><span class="ln">6</span><span class="code h1"># Pipeline</span></div>
+      <div class="line" id="line7"><span class="ln">7</span><span class="code">Every release starts from a brief &mdash; see <span id="link">[[project_hotcut]]</span>.</span></div>
+    </div>
+    <div id="status"><span>&#x2325; main</span><span>&#x2713; Prettier</span><span class="right"><span>Ln 7, Col 46</span><span>UTF-8</span><span>Markdown</span></span></div>
+  </div>
+
+  <div id="shade">
+    <div id="modal">
+      <div class="mtitle">Memory Lint</div>
+      <div class="mbody">Run --fix? It rewrites unambiguous links and name: fields directly in the memory files.</div>
+      <div class="mbtns"><div class="mbtn primary">Fix</div><div class="mbtn ghost">Cancel</div></div>
+    </div>
+  </div>
+
+  <div id="toast"><span class="info">&#x24d8;</span><span>Memory Lint: --fix applied.</span></div>
+
+<script>
+  const step = +(new URLSearchParams(location.search).get("step") || 0);
+  const $ = (id) => document.getElementById(id);
+  const on = (id, v) => { $(id).style.display = v ? "" : "none"; };
+
+  const typo = step >= 1 && step <= 4;      // broken link text visible
+  $("link").textContent = typo ? "[[project_hotcat]]" : "[[project_hotcut]]";
+  $("link").classList.toggle("squig", step >= 2 && step <= 4);
+  $("tabmark").textContent = step === 1 ? "●" : "✕"; // dirty dot
+  on("badge", step >= 2 && step <= 4);
+  on("rowClean", step === 0 || step === 5);
+  on("rowIssue", step >= 2 && step <= 4);
+  if (step === 1) on("rowClean", true);      // stale "clean" until save
+  $("rowIssue").classList.toggle("selected", step === 3 || step === 4);
+  $("line7").classList.toggle("hl", step === 3 || step === 4);
+  on("shade", step === 4);
+  on("toast", step === 5);
+</script>
+</body>
+</html>

@@ -1,3 +1,5 @@
 .vscode/**
 *.vsix
 logo.html
+demo.html
+demo.gif

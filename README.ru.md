@@ -91,6 +91,8 @@ python claude_memory_lint.py "PATH" --fix  # исправить часть ош�
 при старте и при сохранении. Читает только `~/.claude/projects/*/memory/`,
 без сети и телеметрии.
 
+![демо](vscode-extension/demo.gif)
+
 Исходники — в [`vscode-extension/`](vscode-extension/).
 
 ## Что проверяет

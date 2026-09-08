@@ -85,6 +85,8 @@ the offending line, editor squiggles, Ctrl+click navigation on `[[wikilinks]]`,
 and an auto-check on startup and on save. Reads only
 `~/.claude/projects/*/memory/`, no network, no telemetry.
 
+![demo](vscode-extension/demo.gif)
+
 Source lives in [`vscode-extension/`](vscode-extension/).
 
 ## What it checks
