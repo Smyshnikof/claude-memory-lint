@@ -33,6 +33,11 @@ note's own slug pointed at a filename that never existed.
 
 This tool finds that, and repairs the unambiguous part of it.
 
+As of the first release (September 2026), nothing else did — not the
+ecosystem, not Claude Code itself. Anthropic, you're welcome 😌 — and if you
+ever ship this natively, this repo will retire with honor: that would be the
+best possible outcome for everyone's memory.
+
 ## Install
 
 No dependencies, standard library only, Python 3.8+.
