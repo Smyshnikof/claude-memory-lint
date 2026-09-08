@@ -2,6 +2,10 @@
 
 Скрипт, который проверяет ссылки и структуру файловой памяти [Claude Code](https://code.claude.com/docs/en/memory). Помогает найти заметки, к которым потерялся путь, и исправить часть ошибок в именах.
 
+[![tests](https://github.com/Smyshnikof/claude-memory-lint/actions/workflows/ci.yml/badge.svg)](https://github.com/Smyshnikof/claude-memory-lint/actions/workflows/ci.yml)
+[![VS Code extension](https://img.shields.io/visual-studio-marketplace/v/smyshnikof.claude-memory-lint-vscode?label=VS%20Code%20extension&color=BF4F33)](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
+[![installs](https://img.shields.io/visual-studio-marketplace/i/smyshnikof.claude-memory-lint-vscode?color=BF4F33)](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
+
 [English version](README.md)
 
 ## Зачем это нужно
@@ -73,6 +77,19 @@ python claude_memory_lint.py "PATH" --fix  # исправить часть ош�
 ```
 
 В отчёте указаны файл, строка и причина замечания. Для части битых ссылок скрипт предлагает замену.
+
+## Расширение VS Code
+
+<img src="vscode-extension/icon.png" width="96" align="right" alt="иконка расширения">
+
+Те же проверки — панелью в редакторе:
+[**Claude Memory Lint** в Marketplace](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
+— значок в Activity Bar с бейджем-счётчиком, список находок с переходом к
+строке, подчёркивания в редакторе, Ctrl+клик по `[[ссылкам]]`, автопроверка
+при старте и при сохранении. Читает только `~/.claude/projects/*/memory/`,
+без сети и телеметрии.
+
+Исходники — в [`vscode-extension/`](vscode-extension/).
 
 ## Что проверяет
 

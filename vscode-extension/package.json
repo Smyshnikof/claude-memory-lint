@@ -1,0 +1,105 @@
+{
+  "name": "claude-memory-lint-vscode",
+  "displayName": "Claude Memory Lint",
+  "description": "%ext.description%",
+  "version": "0.2.1",
+  "publisher": "smyshnikof",
+  "license": "MIT",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#BF4F33",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Smyshnikof/claude-memory-lint"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters"
+  ],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "memory",
+    "lint",
+    "wikilink"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "memoryLint",
+          "title": "%view.container.title%",
+          "icon": "icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "memoryLint": [
+        {
+          "id": "memoryLint.issues",
+          "name": "%view.issues.name%"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "memoryLint.issues",
+        "contents": "%view.welcome%"
+      }
+    ],
+    "commands": [
+      {
+        "command": "memoryLint.run",
+        "title": "%cmd.run%",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "memoryLint.fix",
+        "title": "%cmd.fix%",
+        "icon": "$(wrench)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "memoryLint.run",
+          "when": "view == memoryLint.issues",
+          "group": "navigation@1"
+        },
+        {
+          "command": "memoryLint.fix",
+          "when": "view == memoryLint.issues",
+          "group": "navigation@2"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Claude Memory Lint",
+      "properties": {
+        "memoryLint.runOnStartup": {
+          "type": "boolean",
+          "default": true,
+          "description": "%cfg.runOnStartup%"
+        },
+        "memoryLint.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "%cfg.pythonPath%"
+        },
+        "memoryLint.scriptPath": {
+          "type": "string",
+          "default": "",
+          "description": "%cfg.scriptPath%"
+        }
+      }
+    }
+  }
+}

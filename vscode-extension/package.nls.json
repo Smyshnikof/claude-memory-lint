@@ -1,0 +1,11 @@
+{
+  "ext.description": "Integrity checks for Claude Code's file-based memory: broken [[wikilinks]], orphans, frontmatter — as a sidebar panel, badge and editor diagnostics.",
+  "view.container.title": "Claude Memory",
+  "view.issues.name": "Lint",
+  "view.welcome": "Memory has not been checked yet.\n[Check now](command:memoryLint.run)",
+  "cmd.run": "Memory Lint: Check Memory",
+  "cmd.fix": "Memory Lint: Fix Unambiguous Issues (--fix)",
+  "cfg.runOnStartup": "Check memory automatically when VS Code starts. When off, linting runs only on demand and when a memory note is saved.",
+  "cfg.pythonPath": "Interpreter used to run check.py (python / py / full path).",
+  "cfg.scriptPath": "Custom path to check.py. Empty — the copy bundled with the extension is used."
+}

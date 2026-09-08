@@ -2,6 +2,10 @@
 
 Integrity checks for [Claude Code](https://claude.com/claude-code)'s file-based memory.
 
+[![tests](https://github.com/Smyshnikof/claude-memory-lint/actions/workflows/ci.yml/badge.svg)](https://github.com/Smyshnikof/claude-memory-lint/actions/workflows/ci.yml)
+[![VS Code extension](https://img.shields.io/visual-studio-marketplace/v/smyshnikof.claude-memory-lint-vscode?label=VS%20Code%20extension&color=BF4F33)](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
+[![installs](https://img.shields.io/visual-studio-marketplace/i/smyshnikof.claude-memory-lint-vscode?color=BF4F33)](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
+
 [Русская версия](README.ru.md)
 
 ## The problem
@@ -64,6 +68,19 @@ git hook as is.
   orphan: 1
     ref_stray_finding.md  unreachable from MEMORY.md - nothing links here
 ```
+
+## VS Code extension
+
+<img src="vscode-extension/icon.png" width="96" align="right" alt="extension icon">
+
+The same checks as a sidebar panel:
+[**Claude Memory Lint** on the Marketplace](https://marketplace.visualstudio.com/items?itemName=smyshnikof.claude-memory-lint-vscode)
+— an Activity Bar icon with an issue-count badge, a findings list that jumps to
+the offending line, editor squiggles, Ctrl+click navigation on `[[wikilinks]]`,
+and an auto-check on startup and on save. Reads only
+`~/.claude/projects/*/memory/`, no network, no telemetry.
+
+Source lives in [`vscode-extension/`](vscode-extension/).
 
 ## What it checks
 
