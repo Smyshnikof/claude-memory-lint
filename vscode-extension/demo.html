@@ -1,5 +1,5 @@
 <!doctype html>
-<html style="overflow:hidden">
+<html style="overflow:hidden;background:#1e1e1e">
 <head>
 <meta charset="utf-8">
 <style>
@@ -21,21 +21,24 @@
   }
   /* sidebar */
   #sidebar { width: 300px; background: #252526; border-right: 1px solid #1b1b1b; }
-  #sidehead { display: flex; align-items: center; padding: 8px 12px; color: #bbbbbb; font-size: 11px; letter-spacing: .5px; }
-  #sidehead .title { flex: 1; }
+  #sidehead { display: flex; align-items: center; padding: 8px 10px; color: #bbbbbb; font-size: 11px; letter-spacing: .5px; }
+  #sidehead .hdesc { color: #7a7a7a; letter-spacing: 0; margin-left: 8px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #sidehead .btn { color: #cccccc; margin-left: 10px; font-size: 14px; }
-  .row { display: flex; align-items: flex-start; padding: 4px 10px; gap: 6px; line-height: 1.35; }
+  .row { display: flex; align-items: center; padding: 3px 6px; gap: 5px; line-height: 1.35; min-height: 22px; }
+  .row.proj .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 0 1 auto; }
+  .row.proj .pdesc { color: #8c8c8c; white-space: nowrap; flex: none; }
+  .tw { color: #cccccc; width: 12px; flex: none; font-size: 10px; text-align: center; }
+  .ic { flex: none; width: 16px; text-align: center; }
+  .ok-ic { color: #89d185; } .warn-ic { color: #cca700; } .err-ic { color: #f14c4c; }
+  .row.child { padding-left: 40px; align-items: flex-start; }
+  .row.child .lbl { color: #cccccc; white-space: nowrap; }
+  .row.child .desc { color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; }
   .row.selected { background: #04395e; }
-  .row .ic { flex: none; width: 16px; text-align: center; }
-  .ok-ic { color: #89d185; } .err-ic { color: #f14c4c; }
-  .row .lbl { color: #cccccc; white-space: nowrap; }
-  .row .desc { color: #8c8c8c; overflow: hidden; text-overflow: ellipsis; }
   /* editor */
   #main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
   #tabs { height: 35px; background: #2d2d2d; display: flex; align-items: stretch; }
   .tab { background: #1e1e1e; color: #ffffff; padding: 0 12px; display: flex; align-items: center; gap: 8px; border-right: 1px solid #252526; border-top: 1px solid #BF4F33; }
   .tab .close { color: #858585; }
-  .tab .dot { color: #ffffff; }
   #editor { flex: 1; font-family: Consolas, "Courier New", monospace; font-size: 14px; line-height: 21px; padding-top: 8px; position: relative; }
   .line { display: flex; }
   .ln { width: 52px; text-align: right; padding-right: 18px; color: #858585; flex: none; user-select: none; }
@@ -72,9 +75,20 @@
   </div>
 
   <div id="sidebar">
-    <div id="sidehead"><span class="title">CLAUDE MEMORY: LINT</span><span class="btn">&#x21bb;</span><span class="btn">&#x1f527;</span></div>
-    <div id="rowClean" class="row"><span class="ic ok-ic">&#x2713;</span><span class="desc" id="cleanText">Clean: 514 notes, no issues</span></div>
-    <div id="rowIssue" class="row"><span class="ic err-ic">&#x2715;</span><div><span class="lbl">ref_pipeline.md:7</span><br><span class="desc">[[project_hotcat]] does not exist &rarr; did you mean [[project_hotcut]]?</span></div></div>
+    <div id="sidehead"><span>CLAUDE MEMORY: LINT</span><span class="hdesc" id="checked">checked 14:32</span><span class="btn">&#x21bb;</span><span class="btn">&#x1f527;</span></div>
+    <div class="row proj">
+      <span class="tw" id="tw1">&#x25b8;</span>
+      <span class="ic" id="p1ic">&#x2713;</span>
+      <span class="lbl">c--Users-Smysh-Desktop-Assistent</span>
+      <span class="pdesc" id="p1desc">512 notes &middot; clean</span>
+    </div>
+    <div class="row child" id="rowIssue"><span class="ic err-ic">&#x2715;</span><div><span class="lbl">ref_pipeline.md:7</span><br><span class="desc">[[project_hotcat]] does not exist &rarr; did you mean [[project_hotcut]]?</span></div></div>
+    <div class="row proj">
+      <span class="tw">&#x25b8;</span>
+      <span class="ic ok-ic">&#x2713;</span>
+      <span class="lbl">c--Users-Smysh-Desktop-autobench</span>
+      <span class="pdesc">2 notes &middot; clean</span>
+    </div>
   </div>
 
   <div id="main">
@@ -102,20 +116,28 @@
   <div id="toast"><span class="info">&#x24d8;</span><span>Memory Lint: --fix applied.</span></div>
 
 <script>
-  const step = +(new URLSearchParams(location.search).get("step") || 0);
+  const q = new URLSearchParams(location.search);
+  const step = +(q.get("step") || 0);
+  const zoom = +(q.get("zoom") || 1);
+  if (zoom !== 1) document.body.style.zoom = zoom;
   const $ = (id) => document.getElementById(id);
   const on = (id, v) => { $(id).style.display = v ? "" : "none"; };
 
-  const typo = step >= 1 && step <= 4;      // broken link text visible
+  const broken = step >= 2 && step <= 4;      // saved with the typo, lint has seen it
+  const typo = step >= 1 && step <= 4;
   $("link").textContent = typo ? "[[project_hotcat]]" : "[[project_hotcut]]";
-  $("link").classList.toggle("squig", step >= 2 && step <= 4);
+  $("link").classList.toggle("squig", broken);
   $("tabmark").textContent = step === 1 ? "●" : "✕"; // dirty dot
-  on("badge", step >= 2 && step <= 4);
-  on("rowClean", step === 0 || step === 5);
-  on("rowIssue", step >= 2 && step <= 4);
-  if (step === 1) on("rowClean", true);      // stale "clean" until save
+  on("badge", broken);
+  // project row #1 reflects lint state
+  $("tw1").innerHTML = broken ? "&#x25be;" : "&#x25b8;";
+  $("p1ic").textContent = broken ? "⚠" : "✓";
+  $("p1ic").className = "ic " + (broken ? "warn-ic" : "ok-ic");
+  $("p1desc").innerHTML = broken ? "512 notes &middot; 1 issue" : "512 notes &middot; clean";
+  on("rowIssue", broken);
   $("rowIssue").classList.toggle("selected", step === 3 || step === 4);
   $("line7").classList.toggle("hl", step === 3 || step === 4);
+  $("checked").textContent = step >= 5 ? "checked 14:34" : broken ? "checked 14:33" : "checked 14:32";
   on("shade", step === 4);
   on("toast", step === 5);
 </script>
